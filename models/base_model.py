@@ -1,91 +1,90 @@
 #!/usr/bin/python3
+"""defines a base class for all models in our hbnb clone where all classes
+are initialized
+"""
 
-"""This is the base module containing all common attributes/methods
-for other classes"""
 import uuid
-from datetime import datetime, timezone
-from sqlalchemy import Column, String, DATETIME
+from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DateTime
 from models import storage_type
-
 
 Base = declarative_base()
 
 
 class BaseModel:
-    """A class representing the base model for other classes in
-    the hbnb project."""
-    id = Column(String(60), nullable=False, primary_key=True, unique=True)
-    created_at = Column(DATETIME, nullable=False,
-                        default=datetime.now(timezone.utc))
-    updated_at = Column(DATETIME, nullable=False,
-                        default=datetime.now(timezone.utc))
+    """Base class for all models in the HBNB clone.
+
+    Attributes:
+        id (sqlalchemy String): unique identification the base  model.
+        created_at (sqlalchemy DateTime): The date and time of creation.
+        updated_at (sqlalchemy DateTime): The date and time of last update.
+    """
+
+    id = Column(String(60),
+                nullable=False,
+                primary_key=True,
+                unique=True)
+    created_at = Column(DateTime,
+                        nullable=False,
+                        default=datetime.utcnow)
+    updated_at = Column(DateTime,
+                        nullable=False,
+                        default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
-        """Initialize a new instance of the BaseModel class.
+        """Initializes a new model instance.
 
-        Attributes:
-            id (uuid.UUID): A universally unique identifier for the instance.
-            created_at (datetime.datetime): The datetime object representing
-            the creation time (UTC).
-            updated_at (datetime.datetime): The datetime object representing
-            the last update time (UTC).
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
         """
         if not kwargs:
-
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.now(timezone.utc)
-            self.updated_at = datetime.now(timezone.utc)
-
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
         else:
-            for key, value in kwargs.items():
-                if key != '__class__':
-                    if key in ('created_at', 'updated_at'):
-                        setattr(self, key, datetime.fromisoformat(value))
-                    else:
-                        setattr(self, key, value)
-            # if os.getenv('HBNB_TYPE_STORAGE') in ('db'):
+            for k in kwargs:
+                if k in ['created_at', 'updated_at']:
+                    setattr(self, k, datetime.fromisoformat(kwargs[k]))
+                elif k != '__class__':
+                    setattr(self, k, kwargs[k])
             if storage_type == 'db':
-
                 if not hasattr(kwargs, 'id'):
                     setattr(self, 'id', str(uuid.uuid4()))
                 if not hasattr(kwargs, 'created_at'):
-                    setattr(self, 'created_at', datetime.now(timezone.utc))
+                    setattr(self, 'created_at', datetime.now())
                 if not hasattr(kwargs, 'updated_at'):
-                    setattr(self, 'updated_at', datetime.now(timezone.utc))
+                    setattr(self, 'updated_at', datetime.now())
+
+    def __str__(self):
+        """Returns a string representation of the instance."""
+        return '[{}] ({}) {}'.format(
+            self.__class__.__name__, self.id, self.__dict__)
 
     def save(self):
-        """Update the 'updated_at' attribute with the current UTC time."""
+        """Updates updated_at with current time when instance is changed."""
         from models import storage
-        self.updated_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now()
         storage.new(self)
         storage.save()
 
     def to_dict(self):
-        """Convert the BaseModel instance to a dictionary representation.
+        """Converts instance into dictionary format.
 
         Returns:
-            dict: A dictionary containing all attributes of the instance,
-            including class name,
-                'created_at', and 'updated_at' formatted as ISO 8601 strings.
+            dict: A dictionary containing all attributes of the instance.
         """
-        inst_dict = self.__dict__.copy()
-        inst_dict["__class__"] = self.__class__.__name__
-        inst_dict["created_at"] = self.created_at.isoformat()
-        inst_dict["updated_at"] = self.updated_at.isoformat()
-        return inst_dict
+        instance_dict = self.__dict__.copy()
+        instance_dict['__class__'] = self.__class__.__name__
+        for k in instance_dict:
+            if isinstance(instance_dict[k], datetime):
+                instance_dict[k] = instance_dict[k].isoformat()
+        if '_sa_instance_state' in instance_dict.keys():
+            del instance_dict['_sa_instance_state']
+        return instance_dict
 
     def delete(self):
-        """Deletes this BaseModel instance from the storage"""
+        """Deletes the current instance from the storage."""
         from models import storage
         storage.delete(self)
-
-    def __str__(self):
-        """Return a string representation of the BaseModel instance.
-
-        Returns:
-            str: A string containing the class name, 'id', and attribute
-            dictionary of the instance.
-        """
-        class_name = self.__class__.__name__
-        return f"[{class_name}] ({self.id}) {self.__dict__}"

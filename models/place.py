@@ -61,9 +61,9 @@ class Place(BaseModel, Base):
                 FileStorage relationship between Place and Review
             '''
             from models import storage
-            all_revs = storage.all(Review)
+            all_reviews = storage.all(Review)
             lst = []
-            for rev in all_revs.values():
+            for rev in all_reviews.values():
                 if rev.place_id == self.id:
                     lst.append(rev)
             return lst

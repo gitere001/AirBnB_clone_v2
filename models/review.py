@@ -5,8 +5,8 @@ from sqlalchemy import Column, String, ForeignKey
 from models import storage_type
 
 
-class Review(BaseModel):
-    """ Review classto store review information """
+class Review(BaseModel, Base):
+    """ Review class to store review information """
     __table__ = 'reviews'
     if storage_type == 'db':
         text = Column(String(1024), nullable=False)

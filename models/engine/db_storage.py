@@ -1,17 +1,21 @@
 #!/usr/bin/python3
 """This module defines a class to manage database storage for hbnb clone"""
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-import urllib.parse
-
-from models.base_model import BaseModel, Base
+from models.base_model import Base
 from models.state import State
 from models.city import City
 from models.user import User
-from models.place import Place, place_amenity
+from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
+from os import getenv
+
+if getenv('HBNB_TYPE_STORAGE') == 'db':
+    from models.place import place_amenity
+
+classes = {"User": User, "State": State, "City": City,
+           "Amenity": Amenity, "Place": Place, "Review": Review}
 
 
 class DBStorage:
@@ -21,11 +25,11 @@ class DBStorage:
 
     def __init__(self):
         """intitializing the sql database  storage"""
-        user = os.getenv('HBNB_MYSQL_USER')
-        pword = os.getenv('HBNB_MYSQL_PWD')
-        host = os.getenv('HBNB_MYSQL_HOST')
-        db_name = os.getenv('HBNB_MYSQL_DB')
-        env = os.getenv('HBNB_ENV')
+        user = getenv('HBNB_MYSQL_USER')
+        pword = getenv('HBNB_MYSQL_PWD')
+        host = getenv('HBNB_MYSQL_HOST')
+        db_name = getenv('HBNB_MYSQL_DB')
+        env = getenv('HBNB_ENV')
 
         DATABASE_URL = f"mysql+mysqldb://{user}:{pword}@{host}:3306/{db_name}"
         self.__engine = create_engine(DATABASE_URL, pool_pre_ping=True)
@@ -35,16 +39,15 @@ class DBStorage:
     def all(self, cls=None):
         """return dictionary of models currently in storage"""
         objects = dict()
-        my_classes = (User, State, City, Amenity, Place, Review)
         if cls is None:
-            for clss in my_classes:
-                query = self.__session.query(clss)
-                for obj in query.all():
+            for clss in classes.values():
+                query = self.__session.query(clss).all
+                for obj in query:
                     obj_key = f'{obj.__class__.__name__}.{obj.id}'
                     objects[obj_key] = obj
         else:
-            query = self.__session.query(cls)
-            for obj in query.all():
+            query = self.__session.query(cls).all()
+            for obj in query:
                 obj_key = '{}.{}'.format(obj.__class__.__name__, obj.id)
                 objects[obj_key] = obj
         return objects
