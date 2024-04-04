@@ -13,11 +13,11 @@ sudo mkdir -p /data/web_static/releases/
 sudo mkdir -p /data/web_static/releases/test/
 sudo touch /data/web_static/releases/test/index.html
 sudo echo "<html>
-        <head>
-        </head>
-        <body>
-                Alx Software Engineering
-        </body>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body>
 </html>" | sudo tee /data/web_static/releases/test/index.html
 
 # Create symbolic link for current static content
