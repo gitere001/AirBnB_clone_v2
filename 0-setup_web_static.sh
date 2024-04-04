@@ -21,8 +21,7 @@ sudo echo "<html>
 </html>" | sudo tee /data/web_static/releases/test/index.html
 
 # Create symbolic link for current static content
-sudo ln -sf /data/web_static/releases/test/index.html /data/web_static/current/index.html
-
+sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
 # Change ownership recursively to ubuntu user and group
 sudo chown -R ubuntu:ubuntu /data/
 
