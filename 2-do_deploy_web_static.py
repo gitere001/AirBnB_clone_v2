@@ -9,7 +9,7 @@ from os.path import exists
 # Define web server IP addresses
 env.hosts = ['34.207.221.247', '100.26.152.41']
 
-def do_deploy(archive_path):
+def deploy_archive(archive_path):
     """
     Deploy an archive to the web servers.
 
