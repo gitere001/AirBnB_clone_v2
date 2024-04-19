@@ -7,13 +7,14 @@ Routes:
 /: display “Hello HBNB!”
 """
 from flask import Flask
+
 app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
-    """display “Hello HBNB!”"""
-    return "hello HBNB!"
+    """Display “Hello HBNB!”."""
+    return "Hello HBNB!"
 
 
 if __name__ == "__main__":
