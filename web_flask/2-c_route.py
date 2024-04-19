@@ -9,25 +9,26 @@ Routes:
 /c/<text>
 """
 from flask import Flask
+
 app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
-    """display “Hello HBNB!”"""
-    return "hello HBNB!"
+    """Display "Hello HBNB!"."""
+    return "Hello HBNB!"
 
 
 @app.route('/hbnb', strict_slashes=False)
 def display_hbnb():
-    """route /hbnb"""
+    """Display "HBNB"."""
     return "HBNB!"
 
 
 @app.route('/c/<text>', strict_slashes=False)
 def display_c_text(text):
-    """Route to display "C " followed by the value of the text variable """
-    return f"c {text.replace('_', ' ')}"
+    """Display 'C ' followed by the value of the text variable."""
+    return f"C {text.replace('_', ' ')}"
 
 
 if __name__ == "__main__":
