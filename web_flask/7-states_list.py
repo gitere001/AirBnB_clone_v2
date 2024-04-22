@@ -1,7 +1,11 @@
+#!/usr/bin/python3
+
+"""
+This script defines a Flask application to display a list of states.
+"""
+
 from flask import Flask, render_template
-from models import *
 from models import storage
-from sqlalchemy import text  # Import text for explicit column declaration
 from models.state import State
 
 app = Flask(__name__)
@@ -9,15 +13,14 @@ app = Flask(__name__)
 
 @app.route('/states_list', strict_slashes=False)
 def states_list():
-    """display a HTML page with the states listed in alphabetical order"""
-    # Modify the query to explicitly declare the column 'State'
+    """Display a HTML page with the states listed in alphabetical order."""
     states = sorted(list(storage.all(State).values()), key=lambda x: x.name)
     return render_template('7-states_list.html', states=states)
 
 
 @app.teardown_appcontext
 def teardown_db(exception):
-    """closes the storage on teardown"""
+    """Closes the storage on teardown."""
     storage.close()
 
 
